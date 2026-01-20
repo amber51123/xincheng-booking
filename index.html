@@ -14,7 +14,7 @@
         .tab-nav { display: flex; background: #f8f8f8; border-bottom: 1px solid #eee; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: bold; color: #888; cursor: pointer; font-size: 13px; }
         .tab-btn.active { color: var(--accent-color); background: #fff; border-bottom: 2px solid var(--accent-color); }
-        .tab-content { display: none; padding: 15px; max-height: 450px; overflow-y: auto; }
+        .tab-content { display: none; padding: 15px; max-height: 480px; overflow-y: auto; }
         .tab-content.active { display: block; }
         
         .input-group { margin-bottom: 12px; }
@@ -28,7 +28,7 @@
         #capture-area { 
             width: 420px; height: 746.66px; 
             background-color: var(--bg-color); 
-            padding: 40px 20px 30px 20px;
+            padding: 40px 20px 25px 20px;
             display: flex; flex-direction: column; 
             box-sizing: border-box; position: relative;
             overflow: hidden;
@@ -37,28 +37,29 @@
         #bg-image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
         .content-layer { position: relative; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; }
 
-        #title-month { font-size: 22px; font-weight: bold; text-transform: uppercase; text-align: center; margin-bottom: 2px; }
-        #display-studio-name { text-align: center; margin-bottom: 15px; letter-spacing: 4px; font-size: 13px; font-weight: bold; }
+        /* 標題區：改為單一整合大標題 */
+        #display-main-title { font-size: 24px; font-weight: bold; text-transform: uppercase; text-align: center; margin-bottom: 5px; letter-spacing: 1px; }
+        #display-studio-name { text-align: center; margin-bottom: 12px; letter-spacing: 4px; font-size: 14px; font-weight: bold; }
         
         .calendar-grid { 
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; width: 100%; 
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 2.5px; width: 100%; 
             border-top: 1.2px solid rgba(0,0,0,0.1); padding-top: 10px;
             flex: 1; min-height: 0;
         }
         .weekday { font-size: 9px; font-weight: bold; padding-bottom: 5px; text-align: center; }
-        .day-box { border-radius: 4px; display: flex; flex-direction: column; align-items: center; padding: 3px 0; }
-        .day-num { font-size: 11px; font-weight: bold; margin-bottom: 2px; }
-        .slot { font-size: 8px; font-weight: bold; margin: 1px 0; padding: 2px 0; border-radius: 2px; width: 90%; text-align: center; border: 0.5px solid rgba(0,0,0,0.05); }
+        .day-box { border-radius: 4px; display: flex; flex-direction: column; align-items: center; padding: 2px 0; }
+        .day-num { font-size: 10px; font-weight: bold; margin-bottom: 2px; }
+        .slot { font-size: 7.5px; font-weight: bold; margin: 1px 0; padding: 2px 0; border-radius: 2px; width: 92%; text-align: center; border: 0.5px solid rgba(0,0,0,0.03); }
         .slot.booked { opacity: 0 !important; }
 
         /* 底部區域 */
         .footer-wrap { 
             border-top: 1.2px solid rgba(0,0,0,0.1); 
-            padding-top: 12px; 
+            padding-top: 10px; 
             display: flex; align-items: flex-end; justify-content: space-between;
-            width: 100%; position: relative;
+            width: 100%;
         }
-        .footer-notice { font-size: 10px; font-weight: bold; text-align: left; line-height: 1.6; white-space: pre-wrap; flex: 1; z-index: 10; padding-right: 10px; }
+        .footer-notice { font-size: 10px; font-weight: bold; text-align: left; line-height: 1.5; white-space: pre-wrap; flex: 1; z-index: 10; padding-right: 10px; }
         #display-qrcode { object-fit: contain; display: none; z-index: 1; }
         .hl-text { font-weight: 900; }
 
@@ -72,47 +73,53 @@
 
     <div class="settings-panel">
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-time')">📅 時間設定</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-time')">📅 預約時間設定</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-content')">✍️ 內容調整</button>
             <button class="tab-btn" onclick="openTab(event, 'tab-style')">🎨 樣式調整</button>
         </div>
 
         <div id="tab-time" class="tab-content active">
             <div style="display:flex; gap:8px">
-                <div class="input-group" style="flex:1"><label>年份</label><input type="number" id="inputYear" value="2026" oninput="validateAndUpdate()"></div>
-                <div class="input-group" style="flex:1"><label>月份</label><input type="number" id="inputMonth" value="2" oninput="validateAndUpdate()"></div>
+                <div class="input-group" style="flex:1"><label>年份 (計算用)</label><input type="number" id="inputYear" value="2026" oninput="validateAndUpdate()"></div>
+                <div class="input-group" style="flex:1"><label>月份 (計算用)</label><input type="number" id="inputMonth" value="2" oninput="validateAndUpdate()"></div>
             </div>
-            <div class="input-group"><label>時段 (逗號隔開)</label><input type="text" id="timeSlots" value="15:00, 17:00, 19:00" oninput="validateAndUpdate()"></div>
-            <div class="input-group"><label>排除 (2/5 17-19)</label><input type="text" id="excludeSlots" placeholder="2/5 17-19" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>預約時段 (逗號隔開)</label><input type="text" id="timeSlots" value="10:00, 13:00, 15:00, 17:00, 19:00" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>排除特定時段 (月/日 時段)</label><input type="text" id="excludeSlots" placeholder="2/5 17-19" oninput="validateAndUpdate()"></div>
         </div>
 
         <div id="tab-content" class="tab-content">
-            <div class="input-group"><label>工作室名稱</label><input type="text" id="inputStudioName" value="昕澄 xincheng" oninput="validateAndUpdate()"></div>
             <div class="input-group">
-                <label>須知 ([ ] 改色)</label>
+                <label>標題內容</label>
+                <input type="text" id="inputMainTitle" value="2026 FEBRUARY SCHEDULE" oninput="validateAndUpdate()">
+            </div>
+            <div class="input-group">
+                <label>工作室名稱</label>
+                <input type="text" id="inputStudioName" value="昕澄 xincheng" oninput="validateAndUpdate()">
+            </div>
+            <div class="input-group">
+                <label>須知內容 ([ ] 包起來會變色)</label>
                 <textarea id="inputNotice" oninput="validateAndUpdate()">✨ 預約須知
 • 工作室採一對一服務，請提前預約。
 • 變更預約請於「[24小時前]」告知。
 • [遲到者] 施做時間將無法順延。</textarea>
             </div>
             <hr>
-            <div class="input-group"><label>📷 圖片上傳 Logo/QRcode</label><input type="file" id="qrUpload" accept="image/*" onchange="handleQrUpload(this)"></div>
+            <div class="input-group"><label>📷 上傳 Logo/QRcode</label><input type="file" id="qrUpload" accept="image/*" onchange="handleQrUpload(this)"></div>
             <div class="input-group"><label>↔️ 圖片大小</label><input type="range" id="qrSize" min="30" max="250" value="80" oninput="applyStyles()"></div>
             <div class="input-group"><label>👻 圖片透明度</label><input type="range" id="qrOpacity" min="0" max="1" step="0.1" value="1" oninput="applyStyles()"></div>
         </div>
 
         <div id="tab-style" class="tab-content">
-            <div class="color-row"><label>標題文字</label><input type="color" id="cTitle" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>標題文字</label><input type="color" id="cMainTitle" value="#8d775f" oninput="applyStyles()"></div>
             <div class="color-row"><label>工作室名稱</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>底圖/背景底色</label><input type="color" id="cBg" value="#f7f3ee" oninput="applyStyles()"></div>
-            <div class="color-row"><label>星期</label><input type="color" id="cWeek" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>日期</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>背景底色</label><input type="color" id="cBg" value="#f7f3ee" oninput="applyStyles()"></div>
+            <div class="color-row"><label>星期文字</label><input type="color" id="cWeek" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>日期數字</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
             <div class="color-row"><label>預約格子背景色</label><input type="color" id="cBoxBg" value="#ffffff" oninput="applyStyles()"></div>
             <div class="color-row"><label>預約格子文字色</label><input type="color" id="cSlotText" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>預約須知顏色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>須知文字色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
             <div class="color-row"><label>✨ 關鍵字顏色 [ ]</label><input type="color" id="cHighlight" value="#d44d4d" oninput="applyStyles()"></div>
             <hr>
-            <div class="input-group"><label>底圖照片更換</label><input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(this)"></div>
             <div class="input-group"><label>底圖照片透明度</label><input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.5" oninput="applyStyles()"></div>
             <div class="input-group"><label>預約格子透明度</label><input type="range" id="boxOpacity" min="0" max="1" step="0.1" value="0.4" oninput="applyStyles()"></div>
         </div>
@@ -124,7 +131,7 @@
         <div id="capture-area">
             <div id="bg-image-layer"></div>
             <div class="content-layer">
-                <div id="title-month">2026 FEBRUARY</div>
+                <div id="display-main-title">2026 FEBRUARY SCHEDULE</div>
                 <div id="display-studio-name">昕澄 xincheng</div>
                 <div class="calendar-grid" id="calendar"></div>
                 <div class="footer-wrap">
@@ -142,7 +149,6 @@
     </div>
 
     <script>
-        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
         let bgBase64 = localStorage.getItem('xinc_bg') || "";
         let qrBase64 = localStorage.getItem('xinc_qr') || "";
 
@@ -151,14 +157,6 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             evt.currentTarget.classList.add('active');
-        }
-
-        function handleBgUpload(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { bgBase64 = e.target.result; localStorage.setItem('xinc_bg', bgBase64); applyStyles(); };
-                reader.readAsDataURL(input.files[0]);
-            }
         }
 
         function handleQrUpload(input) {
@@ -174,47 +172,35 @@
             const bgLayer = document.getElementById('bg-image-layer');
             const qrImg = document.getElementById('display-qrcode');
             
-            // 基礎背景
             area.style.backgroundColor = document.getElementById('cBg').value;
             bgLayer.style.backgroundImage = bgBase64 ? `url(${bgBase64})` : 'none';
             bgLayer.style.opacity = document.getElementById('bgOpacity').value;
 
-            // Logo
             if (qrBase64) { 
                 qrImg.src = qrBase64; qrImg.style.display = 'block'; 
                 qrImg.style.width = document.getElementById('qrSize').value + "px";
                 qrImg.style.opacity = document.getElementById('qrOpacity').value;
             }
             
-            // 文字顏色
-            document.getElementById('title-month').style.color = document.getElementById('cTitle').value;
+            document.getElementById('display-main-title').style.color = document.getElementById('cMainTitle').value;
             document.getElementById('display-studio-name').style.color = document.getElementById('cStudio').value;
             
-            // 星期與日期
             document.querySelectorAll('.weekday').forEach(el => el.style.color = document.getElementById('cWeek').value);
             document.querySelectorAll('.day-num').forEach(el => el.style.color = document.getElementById('cDay').value);
 
-            // 格子與時段
             const boxColor = document.getElementById('cBoxBg').value;
             const boxOp = document.getElementById('boxOpacity').value;
-            const slotTextCol = document.getElementById('cSlotText').value;
-            
-            // 轉換 Hex 到 RGB 應用透明度
             const r = parseInt(boxColor.slice(1,3), 16), g = parseInt(boxColor.slice(3,5), 16), b = parseInt(boxColor.slice(5,7), 16);
-            document.querySelectorAll('.day-box').forEach(box => {
-                box.style.backgroundColor = `rgba(${r},${g},${b},${boxOp})`;
-            });
-            document.querySelectorAll('.slot').forEach(slot => {
-                slot.style.color = slotTextCol;
-                slot.style.backgroundColor = `rgba(255,255,255,0.7)`; // 時段背景固定微透白提升可讀性
+            document.querySelectorAll('.day-box').forEach(box => { box.style.backgroundColor = `rgba(${r},${g},${b},${boxOp})`; });
+            document.querySelectorAll('.slot').forEach(slot => { 
+                slot.style.color = document.getElementById('cSlotText').value; 
+                slot.style.backgroundColor = `rgba(255,255,255,0.7)`; 
             });
 
-            // 須知
             const noticeEl = document.getElementById('display-notice');
             noticeEl.style.color = document.getElementById('cNotice').value;
             const hlColor = document.getElementById('cHighlight').value;
-            let noticeText = document.getElementById('inputNotice').value;
-            noticeEl.innerHTML = noticeText.replace(/\[(.*?)\]/g, `<span class="hl-text" style="color:${hlColor}">$1</span>`);
+            noticeEl.innerHTML = document.getElementById('inputNotice').value.replace(/\[(.*?)\]/g, `<span class="hl-text" style="color:${hlColor}">$1</span>`);
 
             const settings = {};
             document.querySelectorAll('input, textarea').forEach(el => { if(el.id && el.type !== 'file') settings[el.id] = el.value; });
@@ -224,7 +210,7 @@
         function validateAndUpdate() {
             const year = document.getElementById('inputYear').value || 2026;
             const month = document.getElementById('inputMonth').value || 1;
-            document.getElementById('title-month').innerText = `${year} ${monthNames[month-1]}`;
+            document.getElementById('display-main-title').innerText = document.getElementById('inputMainTitle').value;
             document.getElementById('display-studio-name').innerText = document.getElementById('inputStudioName').value;
             updateCalendar(year, month);
             applyStyles();
@@ -237,7 +223,6 @@
             const firstDay = new Date(year, month - 1, 1).getDay();
             const daysInMonth = new Date(year, month, 0).getDate();
             const slots = document.getElementById('timeSlots').value.split(',').map(s => s.trim()).filter(s => s.includes(':'));
-            const excludeInput = document.getElementById('excludeSlots').value;
 
             for (let i = 0; i < firstDay; i++) {
                 const div = document.createElement('div'); div.className = 'day-box'; div.style.visibility = 'hidden';
@@ -247,18 +232,9 @@
                 const box = document.createElement('div'); box.className = 'day-box';
                 box.innerHTML = `<div class="day-num">${i}</div>`;
                 slots.forEach(t => {
-                    let skip = false;
-                    excludeInput.split(',').forEach(rule => {
-                        const p = rule.trim().split(' ');
-                        if (p.length >= 2 && p[0] === `${month}/${i}`) {
-                            p[1].split('-').forEach(h => { if(t.startsWith(h.trim() + ":")) skip = true; });
-                        }
-                    });
-                    if (!skip) {
-                        const s = document.createElement('div'); s.className = 'slot'; s.innerText = t;
-                        s.onclick = function() { this.classList.toggle('booked'); };
-                        box.appendChild(s);
-                    }
+                    const s = document.createElement('div'); s.className = 'slot'; s.innerText = t;
+                    s.onclick = function() { this.classList.toggle('booked'); };
+                    box.appendChild(s);
                 });
                 calendar.appendChild(box);
             }
