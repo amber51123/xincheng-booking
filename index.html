@@ -9,58 +9,72 @@
         :root { --bg-color: #f7f3ee; --accent-color: #8d775f; --text-color: #4a4a4a; }
         body { font-family: "PingFang TC", "Noto Sans TC", sans-serif; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; color: var(--text-color); }
         
+        /* 設定區塊 */
         .settings-panel { background: #fff; border-radius: 12px; width: 100%; max-width: 420px; margin-bottom: 15px; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
         .tab-nav { display: flex; background: #f8f8f8; border-bottom: 1px solid #eee; overflow-x: auto; }
-        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: bold; color: #888; cursor: pointer; font-size: 13px; white-space: nowrap; transition: 0.3s; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: bold; color: #888; cursor: pointer; font-size: 13px; white-space: nowrap; }
         .tab-btn.active { color: var(--accent-color); background: #fff; border-bottom: 2px solid var(--accent-color); }
-        
         .tab-content { display: none; padding: 15px; }
         .tab-content.active { display: block; }
-
         .input-group { margin-bottom: 12px; }
         .color-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
         label { font-size: 12px; font-weight: bold; color: var(--accent-color); }
         input[type="color"] { width: 50px; height: 30px; border: none; padding: 0; background: none; cursor: pointer; }
         input[type="text"], input[type="number"], textarea, input[type="range"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
 
-        .responsive-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        /* 預覽與生成區域容器：修復溢出的核心 */
+        .responsive-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; overflow: visible; }
 
-        /* 預約表主體 */
+        /* 預約表主體：取消固定高度限制 */
         #capture-area { 
-            width: 420px; min-height: 746px; background-color: var(--bg-color); 
-            padding: 45px 20px; display: flex; flex-direction: column; align-items: center; 
-            box-sizing: border-box; text-align: center; position: relative; overflow: hidden;
+            width: 420px; 
+            min-height: 746px; /* 至少維持 16:9 */
+            height: auto;      /* 讓內容自動撐開高度 */
+            background-color: var(--bg-color); 
+            padding: 45px 25px 50px 25px; /* 增加底部內距確保不貼邊 */
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            box-sizing: border-box; 
+            text-align: center; 
+            position: relative; 
+            overflow: visible; /* 確保內容不被裁切 */
         }
 
         #bg-image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
-        .content-layer { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; }
+        .content-layer { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; flex-grow: 1; }
 
-        /* 標題修正：確保不換行並自動縮小 */
-        .title-wrap { width: 100%; display: flex; justify-content: center; align-items: center; min-height: 50px; margin-bottom: 5px; }
-        #title-month { 
-            font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; 
-            color: var(--accent-color); margin: 0; white-space: nowrap; width: 100%;
-            display: inline-block;
-        }
+        .title-wrap { width: 100%; display: flex; justify-content: center; align-items: center; min-height: 40px; margin-bottom: 5px; }
+        #title-month { font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); white-space: nowrap; }
+        #display-studio-name { margin: 0 auto 20px auto; letter-spacing: 4px; font-size: 14px; font-weight: bold; width: 100%; }
         
-        #display-studio-name { margin: 0 auto 25px auto; letter-spacing: 4px; font-size: 14px; font-weight: bold; width: 100%; }
-        
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%; border-top: 1.5px solid rgba(141,119,95,0.4); padding-top: 15px; margin-bottom: 20px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%; border-top: 1.5px solid rgba(141,119,95,0.4); padding-top: 15px; margin-bottom: 25px; }
         .weekday { font-size: 10px; font-weight: bold; padding-bottom: 8px; }
-        .day-box { min-height: 90px; border-radius: 6px; background: rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; padding: 4px 1px; border: 0.5px solid rgba(0,0,0,0.02); }
+        .day-box { min-height: 85px; border-radius: 6px; background: rgba(255,255,255,0.6); display: flex; flex-direction: column; align-items: center; padding: 4px 1px; }
         .day-num { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
         
-        .slot { font-size: 10px; font-weight: bold; background: #fff; margin: 2px 0; padding: 4px 2px; border-radius: 4px; border: 0.5px solid #eee; width: 90%; cursor: pointer; }
+        .slot { font-size: 10px; font-weight: bold; background: #fff; margin: 2px 0; padding: 4px 2px; border-radius: 4px; border: 0.5px solid #eee; width: 92%; cursor: pointer; }
         .slot.booked { opacity: 0 !important; }
-        .past-day { opacity: 0.25; pointer-events: none; }
         
-        .footer-notice { font-size: 12px; font-weight: bold; margin-top: auto; padding-top: 20px; width: 100%; border-top: 1.5px solid rgba(141,119,95,0.2); text-align: left; line-height: 1.7; white-space: pre-wrap; }
+        /* 須知區塊優化：確保它位於最底部並撐開容器 */
+        .footer-notice { 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-top: auto; 
+            padding-top: 20px; 
+            width: 100%; 
+            border-top: 1.5px solid rgba(141,119,95,0.2); 
+            text-align: left; 
+            line-height: 1.7; 
+            white-space: pre-wrap;
+            box-sizing: border-box;
+        }
         
-        .btn-generate { width: 100%; max-width: 420px; padding: 16px; background: var(--accent-color); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 18px; margin-bottom: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-generate { width: 100%; max-width: 420px; padding: 16px; background: var(--accent-color); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 18px; margin-bottom: 20px; cursor: pointer; }
 
         #preview-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
-        #preview-image { max-width: 90%; max-height: 80vh; border-radius: 10px; object-fit: contain; }
-        .btn-close { margin-top: 15px; padding: 10px 40px; background: #fff; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
+        #preview-image { max-width: 90%; max-height: 80vh; border-radius: 10px; object-fit: contain; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .btn-close { margin-top: 15px; padding: 10px 40px; background: #fff; border-radius: 5px; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -77,7 +91,7 @@
                 <div class="input-group" style="flex:1"><label>年份</label><input type="number" id="inputYear" value="2026" oninput="validateAndUpdate()"></div>
                 <div class="input-group" style="flex:1"><label>月份</label><input type="number" id="inputMonth" value="2" min="1" max="12" oninput="validateAndUpdate()"></div>
             </div>
-            <div class="input-group"><label>開放時段 (逗號分隔)</label><input type="text" id="timeSlots" value="15:00, 17:00, 19:00" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>開放時段</label><input type="text" id="timeSlots" value="15:00, 17:00, 19:00" oninput="validateAndUpdate()"></div>
             <div class="input-group"><label>排除 (例: 2/5 17-19)</label><input type="text" id="excludeSlots" placeholder="2/5 17-19" oninput="validateAndUpdate()"></div>
         </div>
 
@@ -85,18 +99,19 @@
             <div class="input-group"><label>工作室名稱</label><input type="text" id="inputStudioName" value="昕澄 xincheng" oninput="validateAndUpdate()"></div>
             <div class="input-group"><label>預約須知</label><textarea id="inputNotice" oninput="validateAndUpdate()">✨ 預約須知
 • 工作室採一對一服務，請務必提前預約。
-• 如需變更或取消預約，請於「24小時前」告知。</textarea></div>
+• 如需變更或取消預約，請於「24小時前」告知。
+• 為維護服務品質，遲到者施做時間將無法順延。</textarea></div>
         </div>
 
         <div id="tab-style" class="tab-content">
-            <div class="color-row"><label>標題顏色 (2026...)</label><input type="color" id="cTitle" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>標題顏色</label><input type="color" id="cTitle" value="#8d775f" oninput="applyStyles()"></div>
             <div class="color-row"><label>工作室名稱顏色</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>星期顏色 (週日...)</label><input type="color" id="cWeek" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>日期顏色 (1, 2...)</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>星期顏色</label><input type="color" id="cWeek" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>日期顏色</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
             <div class="color-row"><label>預約須知顏色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
             <div class="color-row"><label>底圖背景色</label><input type="color" id="cBg" value="#f7f3ee" oninput="applyStyles()"></div>
             <hr style="border:0.5px solid #eee; margin:15px 0;">
-            <div class="input-group"><label>🖼️ 上傳底圖照片</label><input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(this)"></div>
+            <div class="input-group"><label>上傳底圖</label><input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(this)"></div>
             <div class="input-group"><label>底圖透明度</label><input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.5" oninput="applyStyles()"></div>
         </div>
     </div>
@@ -107,9 +122,7 @@
         <div id="capture-area">
             <div id="bg-image-layer"></div>
             <div class="content-layer">
-                <div class="title-wrap">
-                    <div id="title-month">2026 FEBRUARY SCHEDULE</div>
-                </div>
+                <div class="title-wrap"><div id="title-month">2026 FEBRUARY SCHEDULE</div></div>
                 <div id="display-studio-name">昕澄 xincheng</div>
                 <div class="calendar-grid" id="calendar">
                     <div class="weekday">週日</div><div class="weekday">週一</div><div class="weekday">週二</div>
@@ -122,7 +135,7 @@
     </div>
 
     <div id="preview-overlay">
-        <div style="color:white; margin-bottom:15px; font-weight:bold;">✨ 預覽生成成功！<br>請【長按圖片】儲存到相簿</div>
+        <div style="color:white; margin-bottom:15px; font-weight:bold; text-align:center;">✨ 生成成功！<br>請【長按圖片】儲存到相簿</div>
         <img id="preview-image" src="">
         <button class="btn-close" onclick="closePreview()">返回修改</button>
     </div>
@@ -149,15 +162,12 @@
         function applyStyles() {
             const area = document.getElementById('capture-area');
             const bgLayer = document.getElementById('bg-image-layer');
-            
             area.style.backgroundColor = document.getElementById('cBg').value;
             bgLayer.style.backgroundImage = bgBase64 ? `url(${bgBase64})` : 'none';
             bgLayer.style.opacity = document.getElementById('bgOpacity').value;
-
             document.getElementById('title-month').style.color = document.getElementById('cTitle').value;
             document.getElementById('display-studio-name').style.color = document.getElementById('cStudio').value;
             document.getElementById('display-notice').style.color = document.getElementById('cNotice').value;
-            
             document.querySelectorAll('.weekday').forEach(el => el.style.color = document.getElementById('cWeek').value);
             document.querySelectorAll('.day-num').forEach(el => el.style.color = document.getElementById('cDay').value);
         }
@@ -166,33 +176,24 @@
             const year = document.getElementById('inputYear').value || 2026;
             const month = document.getElementById('inputMonth').value || 1;
             const titleEl = document.getElementById('title-month');
-            
-            // 更新文字內容
             titleEl.innerText = `${year} ${monthNames[month-1]} SCHEDULE`;
             document.getElementById('display-studio-name').innerText = document.getElementById('inputStudioName').value;
             document.getElementById('display-notice').innerText = document.getElementById('inputNotice').value;
             
-            // 標題字體縮放邏輯：防止換行
-            let fs = 26;
-            titleEl.style.fontSize = fs + "px";
-            while (titleEl.scrollWidth > 380 && fs > 12) {
-                fs--;
-                titleEl.style.fontSize = fs + "px";
-            }
+            let fs = 26; titleEl.style.fontSize = fs + "px";
+            while (titleEl.scrollWidth > 370 && fs > 12) { fs--; titleEl.style.fontSize = fs + "px"; }
             
             updateCalendar(year, month);
             applyStyles();
-            handleResize();
+            setTimeout(handleResize, 50);
         }
 
         function updateCalendar(year, month) {
             const calendar = document.getElementById('calendar');
             while (calendar.children.length > 7) calendar.removeChild(calendar.lastChild);
-            
             const firstDay = new Date(year, month - 1, 1).getDay();
             const daysInMonth = new Date(year, month, 0).getDate();
-            const slotsInput = document.getElementById('timeSlots').value;
-            const slots = slotsInput.split(',').map(s => s.trim()).filter(s => s.includes(':'));
+            const slots = document.getElementById('timeSlots').value.split(',').map(s => s.trim()).filter(s => s.includes(':'));
             const excludeInput = document.getElementById('excludeSlots').value;
 
             for (let i = 0; i < firstDay; i++) {
@@ -224,27 +225,30 @@
             const area = document.getElementById('capture-area');
             const wrapper = document.querySelector('.responsive-wrapper');
             const winW = window.innerWidth;
+            area.style.transform = "none"; 
             if (winW < 440) {
                 const scale = (winW - 20) / 420;
                 area.style.transform = `scale(${scale})`;
-                wrapper.style.height = (area.offsetHeight * scale) + "px";
-            } else {
-                area.style.transform = "none";
-                wrapper.style.height = "auto";
-            }
+                wrapper.style.height = (area.getBoundingClientRect().height) + "px";
+            } else { wrapper.style.height = "auto"; }
         }
 
         function exportImage() {
             const area = document.getElementById('capture-area');
             const oldT = area.style.transform;
-            area.style.transform = "none";
-            window.scrollTo(0,0);
+            area.style.transform = "none"; // 截圖前還原比例以獲得最高畫質
+            
+            // 強制瀏覽器重繪，確保抓取到完整高度
+            const fullHeight = area.offsetHeight; 
+
             html2canvas(area, { 
                 scale: 3, 
                 useCORS: true,
                 backgroundColor: null,
                 width: 420,
-                height: area.scrollHeight
+                height: fullHeight, // 使用計算後的完整高度
+                windowWidth: 420,
+                windowHeight: fullHeight
             }).then(canvas => {
                 area.style.transform = oldT;
                 document.getElementById('preview-image').src = canvas.toDataURL("image/png");
@@ -254,7 +258,6 @@
         }
 
         function closePreview() { document.getElementById('preview-overlay').style.display = 'none'; }
-        
         window.addEventListener('resize', handleResize);
         window.onload = validateAndUpdate;
     </script>
