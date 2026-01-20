@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>昕澄 xincheng 預約工具</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { 
+            --bg-color: #f7f3ee; 
+            --accent-color: #8d775f; 
+            --text-color: #4a4a4a; 
+            --error-color: #d9534f; 
+        }
+        
+        body { 
+            font-family: "PingFang TC", "Noto Sans TC", sans-serif; 
+            background: #e0e0e0; display: flex; flex-direction: column; align-items: center; 
+            padding: 10px; margin: 0; color: var(--text-color); overflow-x: hidden;
+        }
+        
+        .settings-panel {
+            background: #fff; padding: 15px; border-radius: 12px; 
+            width: 100%; max-width: 420px; margin-bottom: 15px; box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .input-row { display: flex; gap: 8px; margin: 10px 0; }
+        .input-group { flex: 1; margin-bottom: 10px; }
+        label { display: block; font-size: 12px; margin-bottom: 4px; font-weight: bold; }
+        input { width: 100%; padding: 12px 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+
+        .responsive-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        #capture-area {
+            width: 420px; min-width: 420px; background: var(--bg-color); padding: 45px 20px;
+            display: flex; flex-direction: column; align-items: center; box-sizing: border-box;
+            text-align: center; transform-origin: top center;
+        }
+
+        .title-container { width: 100%; display: flex; justify-content: center; align-items: center; min-height: 40px; }
+        #title-month { font-size: 26px; margin: 0; letter-spacing: 1px; color: var(--accent-color); font-weight: bold; text-transform: uppercase; white-space: nowrap; }
+        h2 { margin: 5px auto 30px auto; letter-spacing: 4px; color: var(--text-color); font-size: 14px; opacity: 0.7; font-weight: bold; }
+        
+        .calendar-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%;
+            border-top: 1.5px solid rgba(141, 119, 95, 0.4); padding-top: 15px; margin-bottom: 20px;
+        }
+        .weekday { font-size: 10px; font-weight: bold; text-align: center; color: var(--accent-color); padding-bottom: 8px; }
+        
+        .day-box {
+            min-height: 95px; border-radius: 6px; background: rgba(255,255,255,0.6);
+            display: flex; flex-direction: column; align-items: center; padding: 6px 1px; border: 0.5px solid rgba(0,0,0,0.03);
+        }
+        .day-num { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+        
+        .slot {
+            font-size: 11px; font-weight: bold; background: #fff; margin: 3px 0; padding: 5px 4px;
+            border-radius: 4px; cursor: pointer; border: 0.5px solid #eee; width: 88%; text-align: center;
+            transition: opacity 0.1s;
+        }
+        .slot.booked { opacity: 0 !important; }
+        .past-day { opacity: 0.25; background: rgba(0,0,0,0.02); pointer-events: none; }
+
+        .footer-notice { 
+            font-size: 13px; font-weight: bold; margin-top: 10px; line-height: 1.7; 
+            width: 100%; border-top: 2px solid rgba(141, 119, 95, 0.2); padding-top: 15px; text-align: left;
+        }
+        .btn-generate { width: 100%; padding: 16px; background: var(--accent-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="settings-panel">
+        <h3>⚙️ 預約表設定</h3>
+        <div class="input-row">
+            <div class="input-group"><label>年份</label><input type="number" id="inputYear" value="2026" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>月份</label><input type="number" id="inputMonth" value="2" min="1" max="12" oninput="validateAndUpdate()"></div>
+        </div>
+        <div class="input-group">
+            <label>開放預約時段 (例: 15:00, 19:00)</label>
+            <input type="text" id="timeSlots" value="15:00, 17:00, 19:00" oninput="validateAndUpdate()">
+        </div>
+        <div class="input-group">
+            <label>已預約排除 (格式: 月/日 時-時)</label>
+            <input type="text" id="excludeSlots" placeholder="例: 2/5 17-19" oninput="validateAndUpdate()">
+        </div>
+        <button class="btn-generate" onclick="exportImage()">📷 生成並下載圖片</button>
+    </div>
+
+    <div class="responsive-wrapper">
+        <div id="capture-area">
+            <div class="title-container"><div id="title-month">2026 FEBRUARY SCHEDULE</div></div>
+            <h2>昕澄 xincheng</h2>
+            <div class="calendar-grid" id="calendar">
+                <div class="weekday">週日</div><div class="weekday">週一</div><div class="weekday">週二</div>
+                <div class="weekday">週三</div><div class="weekday">週四</div><div class="weekday">週五</div>
+                <div class="weekday">週六</div>
+            </div>
+            <div class="footer-notice">
+                ✨ 預約須知<br>
+                • 工作室採一對一服務，請務必提前預約。<br>
+                • 如需變更或取消預約，請於<span style="color:#d9534f">「24小時前」</span>告知。<br>
+                • 為維護服務品質，遲到者施做時間將無法順延。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+        
+        function handleResize() {
+            const wrapper = document.querySelector('.responsive-wrapper');
+            const area = document.getElementById('capture-area');
+            const winW = window.innerWidth;
+            if (winW < 440) {
+                const scale = (winW - 20) / 420;
+                area.style.transform = `scale(${scale})`;
+                wrapper.style.height = (area.getBoundingClientRect().height) + "px";
+            } else {
+                area.style.transform = "none";
+                wrapper.style.height = "auto";
+            }
+        }
+
+        function validateAndUpdate() {
+            const year = parseInt(document.getElementById('inputYear').value) || 2026;
+            const month = parseInt(document.getElementById('inputMonth').value) || 1;
+            const timeInput = document.getElementById('timeSlots').value;
+            const excludeInput = document.getElementById('excludeSlots').value;
+            
+            const titleEl = document.getElementById('title-month');
+            titleEl.innerText = `${year} ${monthNames[month-1]} SCHEDULE`;
+            
+            let fs = 26; titleEl.style.fontSize = fs + "px";
+            while (titleEl.offsetWidth > 380 && fs > 12) { fs--; titleEl.style.fontSize = fs + "px"; }
+
+            const slots = [...new Set(timeInput.split(',').map(s => s.trim()).filter(s => s.includes(':')))].sort();
+            const excludeRules = excludeInput.split(',').map(s => s.trim()).filter(s => s !== "");
+
+            updateCalendar(year, month, slots, excludeRules);
+            setTimeout(handleResize, 100);
+        }
+
+        function updateCalendar(year, month, slots, excludeRules) {
+            const calendar = document.getElementById('calendar');
+            while (calendar.children.length > 7) calendar.removeChild(calendar.lastChild);
+            const firstDay = new Date(year, month - 1, 1).getDay();
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const today = new Date();
+            const curY = today.getFullYear();
+            const curM = today.getMonth() + 1;
+            const curD = today.getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const div = document.createElement('div');
+                div.className = 'day-box empty-day';
+                div.style.visibility = 'hidden';
+                calendar.appendChild(div);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const box = document.createElement('div');
+                box.className = 'day-box';
+                const isPast = (year < curY || (year === curY && month < curM) || (year === curY && month === curM && i < curD));
+                if (isPast) box.classList.add('past-day');
+                box.innerHTML = `<div class="day-num">${i}</div>`;
+                
+                if (!isPast) {
+                    slots.forEach(t => {
+                        let shouldExclude = false;
+                        excludeRules.forEach(rule => {
+                            const parts = rule.split(' ');
+                            if (parts.length >= 2) {
+                                const datePart = parts[0]; // "2/5"
+                                const timePart = parts[1]; // "17-19"
+                                
+                                // 改為判斷 月/日
+                                if (datePart === `${month}/${i}`) {
+                                    const hours = timePart.split('-'); // ["17", "19"]
+                                    hours.forEach(h => {
+                                        if (t.startsWith(h.trim() + ":")) {
+                                            shouldExclude = true;
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+                        if (shouldExclude) return;
+
+                        const s = document.createElement('div');
+                        s.className = 'slot';
+                        s.innerText = t;
+                        s.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            this.classList.toggle('booked');
+                        });
+                        box.appendChild(s);
+                    });
+                }
+                calendar.appendChild(box);
+            }
+        }
+
+        function exportImage() {
+            const area = document.querySelector("#capture-area");
+            const oldT = area.style.transform;
+            area.style.transform = "none";
+            html2canvas(area, { scale: 3, backgroundColor: "#f7f3ee" }).then(canvas => {
+                area.style.transform = oldT;
+                const link = document.createElement('a');
+                link.download = `昕澄預約表_${document.getElementById('inputMonth').value}月.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        }
+
+        window.addEventListener('resize', handleResize);
+        window.onload = validateAndUpdate;
+    </script>
+</body>
+</html>
