@@ -27,33 +27,12 @@
         .color-row input[type="color"] { width: 40px; height: 28px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; padding: 0; background: none; }
         hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
 
-        /* --- 修正後的畫布容器 --- */
-        .responsive-wrapper { 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            align-items: flex-start;
-            overflow: visible;
-        }
-
-        #capture-area { 
-            width: 420px; 
-            height: 746.66px; 
-            background-color: var(--bg-color); 
-            padding: 45px 20px 35px 20px;
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box; 
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0; /* 防止被 flex 壓縮 */
-        }
-
-        /* 修正底圖填滿 */
+        /* 畫布容器 */
+        .responsive-wrapper { width: 100%; display: flex; justify-content: center; align-items: flex-start; overflow: visible; }
+        #capture-area { width: 420px; height: 746.66px; background-color: var(--bg-color); padding: 45px 20px 35px 20px; display: flex; flex-direction: column; box-sizing: border-box; position: relative; overflow: hidden; flex-shrink: 0; }
         #bg-image-layer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
         .content-layer { position: relative; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; }
 
-        /* 行事曆與文字 */
         .header-section { flex-shrink: 0; text-align: center; margin-bottom: 15px; }
         #display-main-title { font-size: 26px; font-weight: bold; text-transform: uppercase; }
         #display-studio-name { letter-spacing: 5px; font-size: 14px; font-weight: bold; margin-top: 5px; }
@@ -63,9 +42,21 @@
         .weekday { font-size: 10px; font-weight: bold; text-align: center; height: 20px; }
         .day-box { border-radius: 4px; display: flex; flex-direction: column; align-items: center; padding: 4px 0; }
         .day-num { font-size: 11px; font-weight: bold; margin-bottom: 2px; }
+        
         .slot-container { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; justify-content: center; }
-        .slot { font-size: 8.5px; font-weight: bold; padding: 2px 0; border-radius: 2px; width: 90%; text-align: center; border: 0.5px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.8); cursor: pointer; }
-        .slot.booked { display: none !important; }
+        
+        /* 時段按鈕樣式 */
+        .slot { 
+            font-size: 8.5px; font-weight: bold; padding: 2px 0; border-radius: 2px; width: 90%; text-align: center; 
+            border: 0.5px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.8); cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        /* 已預約狀態：僅淡化不劃掉 */
+        .slot.booked { 
+            background: rgba(0,0,0,0.1) !important; 
+            color: rgba(0,0,0,0.2) !important; 
+            border: 0.5px solid rgba(0,0,0,0.05);
+        }
 
         .slogan-divider { text-align: center; margin: 15px 0; font-size: 12px; letter-spacing: 3px; flex-shrink: 0; }
         .footer-wrap { flex-shrink: 0; border-top: 1.5px solid rgba(0,0,0,0.1); padding-top: 15px; display: flex; align-items: center; justify-content: space-between; width: 100%; }
@@ -82,9 +73,9 @@
 
     <div class="settings-panel">
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-time')">📅 時間設定</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-content')">✍️ 內容調整</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-style')">🎨 樣式調整</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-time')">📅 時間</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-content')">✍️ 內容</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-style')">🎨 樣式</button>
         </div>
         
         <div id="tab-time" class="tab-content active">
@@ -92,29 +83,29 @@
                 <div class="input-group" style="flex:1"><label>年份</label><input type="number" id="inputYear" value="2026" oninput="validateAndUpdate()"></div>
                 <div class="input-group" style="flex:1"><label>月份</label><input type="number" id="inputMonth" value="2" oninput="validateAndUpdate()"></div>
             </div>
-            <div class="input-group"><label>標準時段 (自動排序)</label><input type="text" id="timeSlots" value="10:00, 14:00, 19:00" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>標準時段 (日曆點擊可切換反灰)</label><input type="text" id="timeSlots" value="10:00, 14:00, 19:00" oninput="validateAndUpdate()"></div>
             <div class="input-group"><label>🚫 公休日 (手動留白)</label><input type="text" id="excludeDays" placeholder="例如: 1, 15" oninput="validateAndUpdate()"></div>
-            <div class="input-group"><label>❌ 已預約排除 (5 14:00)</label><textarea id="excludeSlots" style="height: 60px;" oninput="validateAndUpdate()"></textarea></div>
+            <div class="input-group"><label>❌ 初始排除 (格式: 5 14:00)</label><textarea id="excludeSlots" style="height: 60px;" oninput="validateAndUpdate()"></textarea></div>
         </div>
         
         <div id="tab-content" class="tab-content">
             <div class="input-group"><label>工作室名稱</label><input type="text" id="inputStudioName" value="昕澄 xincheng" oninput="validateAndUpdate()"></div>
             <div class="input-group"><label>大標題</label><input type="text" id="inputMainTitle" value="2026 FEBRUARY" oninput="validateAndUpdate()"></div>
-            <div class="input-group"><label>標語</label><input type="text" id="inputSlogan" value="XINCHENG_TPE" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>標語</label><input type="text" id="inputSlogan" value="HOT POT THERAPY" oninput="validateAndUpdate()"></div>
             <div class="input-group"><label>預約須知</label><textarea id="inputNotice" oninput="validateAndUpdate()">✨ 預約須知
 • 採一對一服務，請提前預約。
 • 變更預約請於「[24小時前]」告知。
 • [遲到15分鐘] 將視同取消預約。</textarea></div>
             <hr>
             <div class="input-group">
-                <label>📷 QRcode/LOGO上傳(呈現於右下角)</label>
+                <label>📷 QRcode 上傳</label>
                 <div class="upload-row">
                     <input type="file" id="qrUpload" accept="image/*" onchange="handleImageUpload(this, 'qr')">
                     <button class="btn-clear" onclick="clearImage('qr')">刪除</button>
                 </div>
             </div>
-            <div class="input-group"><label>🏁 透明度</label><input type="range" id="qrOpacity" min="0" max="1" step="0.1" value="1" oninput="applyStyles()"></div>
-            <div class="input-group"><label>↔️ 大小</label><input type="range" id="qrSize" min="30" max="150" value="70" oninput="applyStyles()"></div>
+            <div class="input-group"><label>🏁 QR 透明度</label><input type="range" id="qrOpacity" min="0" max="1" step="0.1" value="1" oninput="applyStyles()"></div>
+            <div class="input-group"><label>↔️ QR 大小</label><input type="range" id="qrSize" min="30" max="150" value="70" oninput="applyStyles()"></div>
         </div>
         
         <div id="tab-style" class="tab-content">
@@ -126,20 +117,20 @@
                 </div>
             </div>
             <div class="input-group"><label>👻 底圖透明度</label><input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.5" oninput="applyStyles()"></div>
-            <div class="input-group"><label>🔲 日期格子透明度</label><input type="range" id="boxOpacity" min="0" max="1" step="0.1" value="0.4" oninput="applyStyles()"></div>
+            <div class="input-group"><label>🔲 日期格子背景透明度</label><input type="range" id="boxOpacity" min="0" max="1" step="0.1" value="0.4" oninput="applyStyles()"></div>
             <hr>
-            <div class="color-row"><label>標題</label><input type="color" id="cMainTitle" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>工作室名稱</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>星期</label><input type="color" id="cWeekday" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>日期數字</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>時段文字</label><input type="color" id="cSlotText" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>標語</label><input type="color" id="cSlogan" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>須知一般文字</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>✨關鍵文字 [] </label><input type="color" id="cNoticeHighlight" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>大標題顏色</label><input type="color" id="cMainTitle" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>工作室名稱顏色</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>星期顏色</label><input type="color" id="cWeekday" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>日期數字顏色</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>時段文字顏色</label><input type="color" id="cSlotText" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>標語顏色</label><input type="color" id="cSlogan" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>須知一般文字顏色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>須知重點文字 [] 顏色</label><input type="color" id="cNoticeHighlight" value="#8d775f" oninput="applyStyles()"></div>
         </div>
     </div>
 
-    <button class="btn-generate" onclick="exportImage()">📷 預約圖生成</button>
+    <button class="btn-generate" onclick="exportImage()">📷 生成 16:9 預約圖</button>
 
     <div class="responsive-wrapper">
         <div id="capture-area">
@@ -211,7 +202,9 @@
             document.getElementById('display-slogan').style.color = document.getElementById('cSlogan').value;
             document.querySelectorAll('.weekday').forEach(el => el.style.color = document.getElementById('cWeekday').value);
             document.querySelectorAll('.day-num').forEach(el => el.style.color = document.getElementById('cDay').value);
-            document.querySelectorAll('.slot').forEach(el => el.style.color = document.getElementById('cSlotText').value);
+            
+            // 只有未反灰的時段套用主文字色
+            document.querySelectorAll('.slot:not(.booked)').forEach(el => el.style.color = document.getElementById('cSlotText').value);
             
             const boxOp = document.getElementById('boxOpacity').value;
             document.querySelectorAll('.day-box').forEach(box => { 
@@ -249,6 +242,7 @@
                 const box = document.createElement('div'); box.className = 'day-box';
                 box.innerHTML = `<div class="day-num">${i}</div>`;
                 const currentBoxDate = new Date(year, month - 1, i);
+                
                 if (currentBoxDate < today || exDays.includes(i)) {
                     box.classList.add('is-exclude'); box.style.opacity = "0.15"; 
                 } else {
@@ -256,7 +250,10 @@
                     slots.forEach(t => {
                         const s = document.createElement('div'); s.className = 'slot'; s.innerText = t;
                         if (exRaw.some(line => line === `${i} ${t}`)) s.classList.add('booked');
-                        s.onclick = function() { this.classList.toggle('booked'); };
+                        s.onclick = function() { 
+                            this.classList.toggle('booked'); 
+                            applyStyles();
+                        };
                         sc.appendChild(s);
                     });
                     box.appendChild(sc);
@@ -279,22 +276,15 @@
             area.style.transform = "none";
             const scale = Math.min(1, (window.innerWidth - 20) / 420);
             area.style.transform = `scale(${scale})`;
-            area.style.transformOrigin = "top center"; // 確保縮放原點在上方中心
+            area.style.transformOrigin = "top center";
             document.querySelector('.responsive-wrapper').style.height = (area.getBoundingClientRect().height) + "px";
         }
 
         function exportImage() {
             const area = document.getElementById('capture-area');
             const oldT = area.style.transform;
-            area.style.transform = "none"; // 擷取時取消縮放，確保品質與對齊
-            html2canvas(area, { 
-                scale: 3, 
-                useCORS: true, 
-                width: 420, 
-                height: 746.66,
-                x: 0,
-                y: 0
-            }).then(canvas => {
+            area.style.transform = "none";
+            html2canvas(area, { scale: 3, useCORS: true, width: 420, height: 746.66, x: 0, y: 0 }).then(canvas => {
                 area.style.transform = oldT;
                 document.getElementById('preview-image').src = canvas.toDataURL("image/png");
                 document.getElementById('preview-overlay').style.display = 'flex';
