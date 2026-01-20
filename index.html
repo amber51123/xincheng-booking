@@ -9,7 +9,7 @@
         :root { --bg-color: #f7f3ee; --accent-color: #8d775f; --text-color: #4a4a4a; }
         body { font-family: "PingFang TC", "Noto Sans TC", sans-serif; background: #e0e0e0; display: flex; flex-direction: column; align-items: center; padding: 10px; margin: 0; color: var(--text-color); }
         
-        /* 面板樣式 */
+        /* 設定面板 */
         .settings-panel { background: #fff; border-radius: 12px; width: 100%; max-width: 420px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
         .tab-nav { display: flex; background: #f8f8f8; border-bottom: 1px solid #eee; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: bold; color: #888; cursor: pointer; font-size: 13px; }
@@ -26,15 +26,16 @@
         /* 預覽區域 */
         .responsive-wrapper { width: 100%; display: flex; justify-content: center; }
         #capture-area { 
-            width: 420px; min-height: 200px;
+            width: 420px; min-height: 746.66px; 
             background-color: var(--bg-color); 
             padding: 45px 25px 40px 25px;
             display: flex; flex-direction: column; 
             box-sizing: border-box; position: relative;
+            overflow: hidden;
         }
 
         #bg-image-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 0; pointer-events: none; }
-        .content-layer { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .content-layer { position: relative; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; }
 
         #title-month { font-size: 24px; font-weight: bold; text-transform: uppercase; text-align: center; margin-bottom: 2px; }
         #display-studio-name { text-align: center; margin-bottom: 20px; letter-spacing: 4px; font-size: 14px; font-weight: bold; }
@@ -46,10 +47,25 @@
         .slot { font-size: 9px; font-weight: bold; background: #fff; margin: 1px 0; padding: 3px 0; border-radius: 3px; width: 92%; text-align: center; border: 0.5px solid #eee; }
         .slot.booked { opacity: 0 !important; }
 
-        /* 底部須知與圖片 */
-        .footer-wrap { display: flex; align-items: flex-end; justify-content: space-between; margin-top: auto; border-top: 1.2px solid rgba(0,0,0,0.1); padding-top: 15px; }
-        .footer-notice { font-size: 11px; font-weight: bold; text-align: left; line-height: 1.7; white-space: pre-wrap; flex: 1; padding-right: 10px; }
-        #display-qrcode { width: 75px; height: auto; object-fit: contain; display: none; }
+        /* 底部排版 */
+        .footer-wrap { margin-top: auto; border-top: 1.2px solid rgba(0,0,0,0.1); padding-top: 15px; position: relative; width: 100%; min-height: 100px; }
+        
+        /* 文字圖層：設定較高的 z-index 並確保背景透明可看見下方的 Logo */
+        .footer-notice { 
+            font-size: 11px; font-weight: bold; text-align: left; line-height: 1.7; white-space: pre-wrap; 
+            width: 100%; position: relative; z-index: 10; 
+        }
+        
+        /* Logo 圖層：z-index 設為較低，使其在文字下方 */
+        #display-qrcode { 
+            position: absolute; 
+            right: 0; 
+            bottom: 0; 
+            object-fit: contain; 
+            display: none; 
+            z-index: 5; 
+            opacity: 0.8; /* 稍微增加透明度，讓疊加時文字更清晰 */
+        }
         .hl-text { font-weight: 900; }
 
         .btn-generate { width: 100%; max-width: 420px; padding: 16px; background: var(--accent-color); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 18px; margin: 10px 0 20px 0; cursor: pointer; }
@@ -73,7 +89,7 @@
                 <div class="input-group" style="flex:1"><label>月份</label><input type="number" id="inputMonth" value="2" oninput="validateAndUpdate()"></div>
             </div>
             <div class="input-group"><label>開放時段</label><input type="text" id="timeSlots" value="15:00, 17:00, 19:00" oninput="validateAndUpdate()"></div>
-            <div class="input-group"><label>排除日期</label><input type="text" id="excludeSlots" placeholder="2/5 17-19" oninput="validateAndUpdate()"></div>
+            <div class="input-group"><label>排除日期時段</label><input type="text" id="excludeSlots" placeholder="2/5 17-19" oninput="validateAndUpdate()"></div>
         </div>
 
         <div id="tab-content" class="tab-content">
@@ -87,25 +103,22 @@
             </div>
             <hr>
             <div class="input-group">
-                <label>📷 上傳右下角圖 (QRcode 或 Logo)</label>
+                <label>📷 上傳 Logo / QRcode</label>
                 <input type="file" id="qrUpload" accept="image/*" onchange="handleQrUpload(this)">
             </div>
             <div class="input-group">
-                <label>↔️ 圖片大小縮放</label>
-                <input type="range" id="qrSize" min="30" max="150" value="75" oninput="applyStyles()">
+                <label>↔️ 圖片縮放 (會在文字下方)</label>
+                <input type="range" id="qrSize" min="30" max="250" value="80" oninput="applyStyles()">
             </div>
         </div>
 
         <div id="tab-style" class="tab-content">
-            <div class="color-row"><label>1. 標題顏色</label><input type="color" id="cTitle" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>2. 工作室顏色</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>3. 星期顏色</label><input type="color" id="cWeek" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>4. 日期顏色</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>5. 背景底色</label><input type="color" id="cBg" value="#f7f3ee" oninput="applyStyles()"></div>
-            <div class="color-row"><label>7. 須知文字顏色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>✨ 關鍵字改色 [ ]</label><input type="color" id="cHighlight" value="#d44d4d" oninput="applyStyles()"></div>
+            <div class="color-row"><label>標題顏色</label><input type="color" id="cTitle" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>背景底色</label><input type="color" id="cBg" value="#f7f3ee" oninput="applyStyles()"></div>
+            <div class="color-row"><label>須知文字顏色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>✨ 關鍵字顏色 [ ]</label><input type="color" id="cHighlight" value="#d44d4d" oninput="applyStyles()"></div>
             <hr>
-            <div class="input-group"><label>6. 更換底圖</label><input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(this)"></div>
+            <div class="input-group"><label>更換大底圖</label><input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload(this)"></div>
             <div class="input-group"><label>底圖透明度</label><input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.5" oninput="applyStyles()"></div>
         </div>
     </div>
@@ -118,8 +131,7 @@
             <div class="content-layer">
                 <div id="title-month">2026 FEBRUARY SCHEDULE</div>
                 <div id="display-studio-name">昕澄 xincheng</div>
-                <div class="calendar-grid" id="calendar">
-                    </div>
+                <div class="calendar-grid" id="calendar"></div>
                 <div class="footer-wrap">
                     <div id="display-notice" class="footer-notice"></div>
                     <img id="display-qrcode">
@@ -129,7 +141,6 @@
     </div>
 
     <div id="preview-overlay">
-        <div style="color:white; margin-bottom:10px; font-weight:bold; text-align:center;">✨ 已生成 16:9 預約圖<br>請【長按圖片】儲存</div>
         <img id="preview-image" src="">
         <button class="btn-close" onclick="closePreview()">返回修改</button>
     </div>
@@ -168,34 +179,25 @@
             const qrImg = document.getElementById('display-qrcode');
             const hlColor = document.getElementById('cHighlight').value;
             
-            // 背景與底圖
             area.style.backgroundColor = document.getElementById('cBg').value;
             bgLayer.style.backgroundImage = bgBase64 ? `url(${bgBase64})` : 'none';
             bgLayer.style.opacity = document.getElementById('bgOpacity').value;
 
-            // QR Code 縮放處理
             if (qrBase64) { 
                 qrImg.src = qrBase64; 
                 qrImg.style.display = 'block'; 
                 qrImg.style.width = document.getElementById('qrSize').value + "px";
             }
             
-            // 文字顏色
             document.getElementById('title-month').style.color = document.getElementById('cTitle').value;
-            document.getElementById('display-studio-name').style.color = document.getElementById('cStudio').value;
             
             const noticeEl = document.getElementById('display-notice');
             noticeEl.style.color = document.getElementById('cNotice').value;
             
-            // 關鍵字改色
             let noticeText = document.getElementById('inputNotice').value;
             let formattedText = noticeText.replace(/\[(.*?)\]/g, `<span class="hl-text" style="color:${hlColor}">$1</span>`);
             noticeEl.innerHTML = formattedText;
 
-            document.querySelectorAll('.weekday').forEach(el => el.style.color = document.getElementById('cWeek').value);
-            document.querySelectorAll('.day-num').forEach(el => el.style.color = document.getElementById('cDay').value);
-            
-            // 保存設置
             const settings = {};
             document.querySelectorAll('input, textarea').forEach(el => { if(el.id && el.type !== 'file') settings[el.id] = el.value; });
             localStorage.setItem('xinc_settings', JSON.stringify(settings));
@@ -214,7 +216,6 @@
         function updateCalendar(year, month) {
             const calendar = document.getElementById('calendar');
             calendar.innerHTML = '<div class="weekday">週日</div><div class="weekday">週一</div><div class="weekday">週二</div><div class="weekday">週三</div><div class="weekday">週四</div><div class="weekday">週五</div><div class="weekday">週六</div>';
-            
             const firstDay = new Date(year, month - 1, 1).getDay();
             const daysInMonth = new Date(year, month, 0).getDate();
             const slots = document.getElementById('timeSlots').value.split(',').map(s => s.trim()).filter(s => s.includes(':'));
@@ -258,15 +259,11 @@
         function exportImage() {
             const area = document.getElementById('capture-area');
             const oldT = area.style.transform;
-            const oldH = area.style.height;
             area.style.transform = "none";
-            area.style.height = "746.66px"; 
             html2canvas(area, { scale: 3, useCORS: true, width: 420, height: 746.66 }).then(canvas => {
                 area.style.transform = oldT;
-                area.style.height = oldH;
-                document.getElementById('preview-image').src = canvas.toURL ? canvas.toDataURL("image/png") : canvas.toDataURL();
+                document.getElementById('preview-image').src = canvas.toDataURL("image/png");
                 document.getElementById('preview-overlay').style.display = 'flex';
-                handleResize();
             });
         }
 
