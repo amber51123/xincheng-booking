@@ -73,9 +73,9 @@
 
     <div class="settings-panel">
         <div class="tab-nav">
-            <button class="tab-btn active" onclick="openTab(event, 'tab-time')">📅 時間</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-content')">✍️ 內容</button>
-            <button class="tab-btn" onclick="openTab(event, 'tab-style')">🎨 樣式</button>
+            <button class="tab-btn active" onclick="openTab(event, 'tab-time')">📅 時間設定</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-content')">✍️ 內容調整</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-style')">🎨 樣式調整</button>
         </div>
         
         <div id="tab-time" class="tab-content active">
@@ -98,14 +98,14 @@
 • [遲到15分鐘] 將視同取消預約。</textarea></div>
             <hr>
             <div class="input-group">
-                <label>📷 QRcode 上傳</label>
+                <label>📷 QRcode/LOGO 上傳</label>
                 <div class="upload-row">
                     <input type="file" id="qrUpload" accept="image/*" onchange="handleImageUpload(this, 'qr')">
                     <button class="btn-clear" onclick="clearImage('qr')">刪除</button>
                 </div>
             </div>
-            <div class="input-group"><label>🏁 QR 透明度</label><input type="range" id="qrOpacity" min="0" max="1" step="0.1" value="1" oninput="applyStyles()"></div>
-            <div class="input-group"><label>↔️ QR 大小</label><input type="range" id="qrSize" min="30" max="150" value="70" oninput="applyStyles()"></div>
+            <div class="input-group"><label>🏁 透明度</label><input type="range" id="qrOpacity" min="0" max="1" step="0.1" value="1" oninput="applyStyles()"></div>
+            <div class="input-group"><label>↔️ 大小</label><input type="range" id="qrSize" min="30" max="150" value="70" oninput="applyStyles()"></div>
         </div>
         
         <div id="tab-style" class="tab-content">
@@ -119,18 +119,18 @@
             <div class="input-group"><label>👻 底圖透明度</label><input type="range" id="bgOpacity" min="0" max="1" step="0.1" value="0.5" oninput="applyStyles()"></div>
             <div class="input-group"><label>🔲 日期格子背景透明度</label><input type="range" id="boxOpacity" min="0" max="1" step="0.1" value="0.4" oninput="applyStyles()"></div>
             <hr>
-            <div class="color-row"><label>大標題顏色</label><input type="color" id="cMainTitle" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>工作室名稱顏色</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>星期顏色</label><input type="color" id="cWeekday" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>日期數字顏色</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>時段文字顏色</label><input type="color" id="cSlotText" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>標語顏色</label><input type="color" id="cSlogan" value="#8d775f" oninput="applyStyles()"></div>
-            <div class="color-row"><label>須知一般文字顏色</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
-            <div class="color-row"><label>須知重點文字 [] 顏色</label><input type="color" id="cNoticeHighlight" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>大標題</label><input type="color" id="cMainTitle" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>工作室名稱</label><input type="color" id="cStudio" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>星期</label><input type="color" id="cWeekday" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>日期數字</label><input type="color" id="cDay" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>時段文字</label><input type="color" id="cSlotText" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>標語</label><input type="color" id="cSlogan" value="#8d775f" oninput="applyStyles()"></div>
+            <div class="color-row"><label>須知文字</label><input type="color" id="cNotice" value="#4a4a4a" oninput="applyStyles()"></div>
+            <div class="color-row"><label>✨須知關鍵文字 [] </label><input type="color" id="cNoticeHighlight" value="#8d775f" oninput="applyStyles()"></div>
         </div>
     </div>
 
-    <button class="btn-generate" onclick="exportImage()">📷 生成 16:9 預約圖</button>
+    <button class="btn-generate" onclick="exportImage()">📷 預約圖生成</button>
 
     <div class="responsive-wrapper">
         <div id="capture-area">
